@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: macro-traco
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SHEET_ID
+        value: 1ARYg5u5gVMbL1jeIotTJGcrWuZ1n4oRHgxBYVIyP2OQ
+      - key: WORKSHEET_NAME
+        sync: false          # set to the tab name that holds the data
+      - key: DRIVE_FOLDER_ID
+        value: 1lMSKUDMbu8fE3n0fd0mk8mVLz1yy37uk
+      - key: GOOGLE_SERVICE_ACCOUNT_JSON
+        sync: false          # paste the service-account JSON key (secret)
+      - key: BUMP_VERSION_ON_START
+        value: "true"        # tick the version once per deploy
+      - key: DEPLOY_NOTE
+        sync: false          # optional one-line note recorded with the version

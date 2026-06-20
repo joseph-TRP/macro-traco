@@ -27,9 +27,10 @@ formulas**, so the spreadsheet stays self-computing.
 The app authenticates to Google as a service account.
 
 1. In Google Cloud, use (or create) a service account and download its JSON key.
-   This project already has one: `jn-python@pragmatic-port-341721.iam.gserviceaccount.com`.
-2. Enable the **Google Sheets API** and **Google Drive API** on that project.
-3. **Share the Sheet and the Drive folder with the service account email as Editor.**
+   This project uses `macro-traco-bot@macro-traco-app.iam.gserviceaccount.com`.
+2. Enable the **Google Sheets API** on that project.
+3. **Share the Sheet with the service account email as Editor** (it reads, appends
+   rows, and stores the version in the `_meta` tab).
 
 ### 2. Local dev
 ```bash
@@ -47,7 +48,8 @@ Open http://localhost:8000
   `WORKSHEET_NAME`, and optionally `DEPLOY_NOTE`.
 
 ## Version counter
-A `version.txt` file in the Drive folder holds `vX.Y.Z | note`. On each deploy
+A hidden `_meta` tab in the database spreadsheet holds `vX.Y.Z | note` in cell
+A1 (cloud-only, no local storage, Sheets API only). On each deploy
 (`BUMP_VERSION_ON_START=true`) the patch number ticks up. Shown in grey at the
 bottom of the app. Purely cosmetic.
 

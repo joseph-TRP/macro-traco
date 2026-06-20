@@ -9,9 +9,7 @@ services:
       - key: SHEET_ID
         value: 1ARYg5u5gVMbL1jeIotTJGcrWuZ1n4oRHgxBYVIyP2OQ
       - key: WORKSHEET_NAME
-        sync: false          # set to the tab name that holds the data
-      - key: DRIVE_FOLDER_ID
-        value: 1lMSKUDMbu8fE3n0fd0mk8mVLz1yy37uk
+        sync: false          # tab name that holds the data; blank = first tab
       - key: GOOGLE_SERVICE_ACCOUNT_JSON
         sync: false          # paste the service-account JSON key (secret)
       - key: BUMP_VERSION_ON_START

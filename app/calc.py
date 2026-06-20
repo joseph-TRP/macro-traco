@@ -82,7 +82,7 @@ def rank_against(value: float, existing_values: list[float]) -> dict:
 # E Form Factor, F Date, G Price, H Size, I Serving Size, J Protein/serving,
 # K Calories, L $/30g, M Cal/30g, N Serving size/30g, O Rank.
 
-def formulas_for_row(row: int, rank_range: str = "$L$2:$L$100000") -> dict[str, str]:
+def formulas_for_row(row: int, rank_range: str = "$L$3:$L$100000") -> dict[str, str]:
     """Return {column_letter: formula} for the calculated columns of `row`."""
     return {
         "L": f"=G{row}*I{row}*30/(H{row}*J{row})",

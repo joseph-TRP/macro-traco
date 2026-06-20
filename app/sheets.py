@@ -14,6 +14,9 @@ from __future__ import annotations
 import json
 import os
 from functools import lru_cache
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 import gspread
 from google.oauth2.service_account import Credentials
@@ -45,7 +48,10 @@ def _credentials() -> Credentials:
         info = json.loads(raw)
         return Credentials.from_service_account_info(info, scopes=SCOPES)
     path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "service_account.json")
-    return Credentials.from_service_account_file(path, scopes=SCOPES)
+    path = Path(path)
+    if not path.is_absolute():
+        path = PROJECT_ROOT / path  # resolve relative to project, not cwd
+    return Credentials.from_service_account_file(str(path), scopes=SCOPES)
 
 
 @lru_cache(maxsize=1)
@@ -62,10 +68,16 @@ def _worksheet():
     return spreadsheet.sheet1
 
 
+# The sheet has a two-row header: row 1 = section group labels, row 2 = the
+# real column headers. Data therefore starts at row 3.
+HEADER_ROW = 2
+FIRST_DATA_ROW = 3
+
+
 def read_rows() -> list[dict]:
     """Return all data rows as dicts keyed by header. Computed columns included."""
     ws = _worksheet()
-    records = ws.get_all_records(expected_headers=HEADERS)
+    records = ws.get_all_records(head=HEADER_ROW, expected_headers=HEADERS)
     return records
 
 
@@ -125,4 +137,25 @@ def append_entry(entry: dict) -> dict:
         [row_values],
         value_input_option="USER_ENTERED",
     )
+
+    # Copy number/currency formatting from the first data row onto the new row so
+    # it displays consistently ($, decimals) like the rest of the sheet.
+    sheet_id = ws.id
+    ws.spreadsheet.batch_update({
+        "requests": [{
+            "copyPaste": {
+                "source": {
+                    "sheetId": sheet_id,
+                    "startRowIndex": FIRST_DATA_ROW - 1, "endRowIndex": FIRST_DATA_ROW,
+                    "startColumnIndex": 0, "endColumnIndex": len(HEADERS),
+                },
+                "destination": {
+                    "sheetId": sheet_id,
+                    "startRowIndex": next_row - 1, "endRowIndex": next_row,
+                    "startColumnIndex": 0, "endColumnIndex": len(HEADERS),
+                },
+                "pasteType": "PASTE_FORMAT",
+            }
+        }]
+    })
     return {"row": next_row}

@@ -1,60 +1,37 @@
-"""App version counter, stored as a text file in the project's Google Drive folder.
+"""App version counter, stored in a hidden '_meta' tab of the database spreadsheet.
 
-Per spec: the version lives in the cloud (not local storage), is dev-style
-(vX.YY.Z), auto-increments on each deploy, and can carry a one-line commit note.
-It is purely cosmetic — shown in light grey at the bottom of the app.
+Cloud-only (lives in the same Google Sheet — no local storage, no Drive API).
+Dev-style vX.Y.Z, auto-increments the patch on each deploy, with an optional
+one-line note. Purely cosmetic — shown in grey at the bottom of the app.
 
-Format of the Drive text file (single line):
-    v0.1.3 | added dashboard filters
-
-`bump()` is intended to run once per deploy (called at app startup). It
-increments the patch number and optionally records a note.
+Stored in cell A1 of the '_meta' tab as a single line:  'v0.1.3 | added filters'
 """
 
 from __future__ import annotations
 
-import io
 import os
 
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaIoBaseUpload
+import gspread
 
-from app.sheets import _credentials
+from app.sheets import _client
 
-VERSION_FILENAME = "version.txt"
+META_TAB = "_meta"
 _DEFAULT = "v0.0.0"
 
 
-def _drive():
-    return build("drive", "v3", credentials=_credentials(), cache_discovery=False)
-
-
-def _find_file(service) -> str | None:
-    folder = os.environ["DRIVE_FOLDER_ID"]
-    q = f"name = '{VERSION_FILENAME}' and '{folder}' in parents and trashed = false"
-    res = service.files().list(q=q, fields="files(id)", pageSize=1).execute()
-    files = res.get("files", [])
-    return files[0]["id"] if files else None
-
-
-def _read_raw(service, file_id: str) -> str:
-    data = service.files().get_media(fileId=file_id).execute()
-    return data.decode("utf-8").strip() if isinstance(data, bytes) else str(data).strip()
-
-
-def _write_raw(service, file_id: str | None, content: str) -> str:
-    media = MediaIoBaseUpload(io.BytesIO(content.encode("utf-8")), mimetype="text/plain")
-    if file_id:
-        service.files().update(fileId=file_id, media_body=media).execute()
-        return file_id
-    meta = {"name": VERSION_FILENAME, "parents": [os.environ["DRIVE_FOLDER_ID"]]}
-    created = service.files().create(body=meta, media_body=media, fields="id").execute()
-    return created["id"]
+def _meta_ws():
+    ss = _client().open_by_key(os.environ["SHEET_ID"])
+    try:
+        return ss.worksheet(META_TAB)
+    except gspread.WorksheetNotFound:
+        ws = ss.add_worksheet(title=META_TAB, rows=2, cols=2)
+        ws.update_acell("A1", _DEFAULT)
+        return ws
 
 
 def _parse(line: str) -> tuple[tuple[int, int, int], str]:
     """'v0.1.3 | note' -> ((0, 1, 3), 'note')."""
-    version, _, note = line.partition("|")
+    version, _, note = (line or "").partition("|")
     note = note.strip()
     nums = version.strip().lstrip("vV").split(".")
     try:
@@ -67,11 +44,8 @@ def _parse(line: str) -> tuple[tuple[int, int, int], str]:
 def get_version() -> str:
     """Return the current version string (e.g. 'v0.1.3'). Never raises."""
     try:
-        service = _drive()
-        file_id = _find_file(service)
-        if not file_id:
-            return _DEFAULT
-        (major, minor, patch), _ = _parse(_read_raw(service, file_id))
+        line = _meta_ws().acell("A1").value or _DEFAULT
+        (major, minor, patch), _ = _parse(line)
         return f"v{major}.{minor}.{patch}"
     except Exception:
         return _DEFAULT
@@ -82,14 +56,13 @@ def bump(note: str = "") -> str:
     Resilient: on any failure it logs and returns the default rather than
     blocking app startup."""
     try:
-        service = _drive()
-        file_id = _find_file(service)
-        current = _read_raw(service, file_id) if file_id else _DEFAULT
-        (major, minor, patch), prev_note = _parse(current)
+        ws = _meta_ws()
+        line = ws.acell("A1").value or _DEFAULT
+        (major, minor, patch), prev_note = _parse(line)
         patch += 1
         new_version = f"v{major}.{minor}.{patch}"
-        line = f"{new_version} | {note}" if note else f"{new_version} | {prev_note}".rstrip(" |")
-        _write_raw(service, file_id, line)
+        out = f"{new_version} | {note}" if note else f"{new_version} | {prev_note}".rstrip(" |")
+        ws.update_acell("A1", out)
         return new_version
     except Exception as exc:  # pragma: no cover - cosmetic feature, must not crash app
         print(f"[version] bump skipped: {exc}")

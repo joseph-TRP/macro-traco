@@ -128,10 +128,21 @@ function renderCompare(c) {
   const o = c.overall;
   const cat = c.category_rank;
 
-  const peek = c.neighbors.map((nb) => `
-    <div class="peek-item">
-      <span class="nm">${nb.food_item} · ${nb.store || ""}</span>
-      <span class="pr">${money(nb.dollars_per_30g)}</span>
+  // Build the neighbour preview with the current entry slotted into its correct
+  // position by $/30g (rather than always pinned to the bottom).
+  const itemName = ($("#food_item").value || "").trim() || "Your item";
+  const peekRows = [
+    ...c.neighbors.map((nb) => ({
+      label: `${nb.food_item} · ${nb.store || ""}`,
+      dollars: nb.dollars_per_30g, you: false,
+    })),
+    { label: `${itemName} (current entry)`, dollars: c.stats.dollars_per_30g, you: true },
+  ].sort((a, b) => a.dollars - b.dollars);
+
+  const peek = peekRows.map((row) => `
+    <div class="peek-item ${row.you ? "you" : ""}">
+      <span class="nm">${row.label}</span>
+      <span class="pr">${money(row.dollars)}</span>
     </div>`).join("");
 
   body.innerHTML = `
@@ -149,7 +160,6 @@ function renderCompare(c) {
     <div class="peek">
       <h4>Where it would sit</h4>
       ${peek}
-      <div class="peek-item you"><span class="nm">⬅ your item</span><span class="pr">${money(c.stats.dollars_per_30g)}</span></div>
     </div>`;
 }
 
@@ -216,7 +226,16 @@ function dashRows() {
     (!form || r["Form Factor"] === form)
   );
 }
+function updateSortIndicators() {
+  $$("#data-table th[data-sort]").forEach((th) => {
+    th.classList.remove("sorted-asc", "sorted-desc");
+    if (th.dataset.sort === state.sort.key) {
+      th.classList.add(state.sort.dir === 1 ? "sorted-asc" : "sorted-desc");
+    }
+  });
+}
 function renderDashboard() {
+  updateSortIndicators();
   const rows = dashRows();
   const dollars = (r) => num(r["$ / 30g protein"]);
   // Stat cards
@@ -237,8 +256,9 @@ function renderDashboard() {
   }[key] || ((r) => (r[key] || "").toString().toLowerCase());
   rows.sort((a, b) => { const x = getter(a), y = getter(b); return x < y ? -dir : x > y ? dir : 0; });
 
+  // After sorting, the top row is the extreme for the current header + direction.
   $("#data-table tbody").innerHTML = rows.map((r, i) => `
-    <tr class="${i === 0 && key === "dollars" ? "best" : ""}">
+    <tr class="${i === 0 ? "row-extreme" : ""}">
       <td>${r["Rank"] || ""}</td>
       <td>${r["Food Item"] || ""}</td>
       <td>${r["Store"] || ""}</td>

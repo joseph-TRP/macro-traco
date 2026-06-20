@@ -27,7 +27,10 @@ body {
   position: sticky; top: 0; z-index: 20;
   background: var(--card);
   border-bottom: 1px solid var(--line);
-  padding: 10px 16px;
+  padding: 10px 0;
+}
+.topbar-inner {
+  max-width: 1100px; margin: 0 auto; width: 100%; padding: 0 16px;
   display: flex; align-items: center; justify-content: space-between;
   gap: 12px; flex-wrap: wrap;
 }
@@ -144,7 +147,7 @@ input.invalid { border-color: var(--danger); box-shadow: 0 0 0 3px #fee2e2; }
 
 /* ---- Dashboard ---- */
 .filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0 12px; align-items: end; }
-.filters .btn { align-self: stretch; }
+.filters .btn { align-self: end; padding: 11px 16px; font-size: 14px; margin-bottom: 12px; }
 .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 16px 0; }
 .stat {
   background: var(--bg); border-radius: 12px; padding: 14px; border: 1px solid var(--line);
@@ -159,7 +162,16 @@ th { background: var(--bg); font-size: 12px; text-transform: uppercase; letter-s
 th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
 tbody tr:hover { background: var(--green-soft); }
 tbody tr:last-child td { border-bottom: 0; }
-.best td { font-weight: 700; }
+
+/* Sort chevrons: dim ⇅ shows a column is sortable; the active column shows direction */
+th[data-sort]::after { content: "⇅"; margin-left: 6px; font-size: 11px; opacity: .35; }
+th[data-sort].sorted-asc::after { content: "▲"; opacity: 1; color: var(--green-dark); }
+th[data-sort].sorted-desc::after { content: "▼"; opacity: 1; color: var(--green-dark); }
+
+/* The top row of the current sort (the extreme for that header+direction) */
+.row-extreme td { background: #fef3c7; font-weight: 700; }
+.row-extreme td:first-child { box-shadow: inset 3px 0 0 var(--green); }
+tbody tr.row-extreme:hover td { background: #fde9a8; }
 
 /* ---- Version ---- */
 .version { text-align: center; color: #cbd5e1; font-size: 12px; padding: 20px 0 28px; font-variant-numeric: tabular-nums; }

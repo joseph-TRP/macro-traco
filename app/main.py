@@ -69,6 +69,13 @@ class EntryInput(CompareInput):
 
 # ---- API --------------------------------------------------------------------
 
+@app.get("/healthz")
+def healthz() -> dict:
+    """Liveness probe for Render's router. Deliberately does NOT touch Google so
+    health stays green regardless of Sheets API latency."""
+    return {"status": "ok"}
+
+
 @app.get("/api/version")
 def api_version() -> dict:
     return {"version": _VERSION}

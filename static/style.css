@@ -147,7 +147,7 @@ input.invalid { border-color: var(--danger); box-shadow: 0 0 0 3px #fee2e2; }
 
 /* ---- Dashboard ---- */
 .filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0 12px; align-items: end; }
-.filters .btn { align-self: end; padding: 11px 16px; font-size: 14px; margin-bottom: 12px; }
+.filters .btn { align-self: end; height: 45px; padding: 0 18px; font-size: 14px; margin-bottom: 12px; display: inline-flex; align-items: center; justify-content: center; }
 .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 16px 0; }
 .stat {
   background: var(--bg); border-radius: 12px; padding: 14px; border: 1px solid var(--line);
@@ -156,7 +156,9 @@ input.invalid { border-color: var(--danger); box-shadow: 0 0 0 3px #fee2e2; }
 .stat .v { font-size: 20px; font-weight: 800; margin-top: 2px; }
 .stat .d { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
-table { width: auto; border-collapse: collapse; font-size: 14px; } /* width:auto = columns fit their text */
+/* min-width:100% fills the frame (distributing slack across columns) when the
+   content is narrower; width:auto lets it grow + scroll when content is wider. */
+table { width: auto; min-width: 100%; border-collapse: collapse; font-size: 14px; }
 th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
 th { background: var(--bg); font-size: 12px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); cursor: pointer; position: sticky; top: 0; }
 th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }

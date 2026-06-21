@@ -192,7 +192,8 @@ $("#btn-add").addEventListener("click", async () => {
     });
     renderCompare(res.compare);
     toast("entry-toast", `Added “${data.food_item}” (row ${res.row}) ✓`, true);
-    await loadOptions(); // pick up any new dropdown values
+    await loadOptions();    // pick up any new dropdown values
+    await loadDashboard();  // refresh the dashboard so the new item shows immediately
   } catch (e) {
     toast("entry-toast", "Add failed: " + e.message, false);
   } finally { btn.disabled = false; }

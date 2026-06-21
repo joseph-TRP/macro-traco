@@ -40,7 +40,9 @@ async def _revalidate_static(request, call_next):
     stale cached copy, so each deploy is picked up without a manual hard refresh."""
     response = await call_next(request)
     path = request.url.path
-    if path == "/" or path.endswith((".css", ".js", ".html")):
+    if path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store"  # always-fresh dynamic data
+    elif path == "/" or path.endswith((".css", ".js", ".html")):
         response.headers["Cache-Control"] = "no-cache"
     return response
 

@@ -81,6 +81,11 @@ input.invalid { border-color: var(--danger); box-shadow: 0 0 0 3px #fee2e2; }
 .date-row { display: flex; gap: 8px; }
 .date-row input[type="text"] { flex: 1; }
 .date-row input[type="date"] { width: 42px; padding: 11px 6px; }
+/* Show only the calendar icon on the date picker, not the mm/dd/yyyy text */
+.date-row input[type="date"]::-webkit-datetime-edit,
+.date-row input[type="date"]::-webkit-inner-spin-button,
+.date-row input[type="date"]::-webkit-clear-button { display: none; }
+.date-row input[type="date"]::-webkit-calendar-picker-indicator { margin: 0; cursor: pointer; }
 
 /* ---- Collapsible details ---- */
 .details-group { border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; margin-bottom: 6px; }

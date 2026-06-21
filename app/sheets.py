@@ -129,6 +129,13 @@ def append_entry(entry: dict) -> dict:
         col_letter = chr(ord("A") + HEADERS.index(header))
         if col_letter in formulas:
             row_values.append(formulas[col_letter])
+        elif header == "Date":
+            # Force the Date to be stored as text. With USER_ENTERED, a real date
+            # like "2026-06-21" would otherwise be parsed into a serial number and
+            # display as an integer. A leading apostrophe keeps it as the literal
+            # string (the apostrophe itself is not stored/shown).
+            val = str(entry.get(header, "")).strip()
+            row_values.append(f"'{val}" if val else "")
         else:
             row_values.append(entry.get(header, ""))
 

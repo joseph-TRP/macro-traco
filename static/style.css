@@ -160,7 +160,7 @@ table { width: 100%; border-collapse: collapse; font-size: 14px; }
 th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
 th { background: var(--bg); font-size: 12px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); cursor: pointer; position: sticky; top: 0; }
 th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
-tbody tr:hover { background: var(--green-soft); }
+tbody tr:hover { background: #fef3c7; } /* cursor highlight = yellow */
 tbody tr:last-child td { border-bottom: 0; }
 
 /* Sort chevrons: dim ⇅ shows a column is sortable; the active column shows direction */
@@ -168,10 +168,10 @@ th[data-sort]::after { content: "⇅"; margin-left: 6px; font-size: 11px; opacit
 th[data-sort].sorted-asc::after { content: "▲"; opacity: 1; color: var(--green-dark); }
 th[data-sort].sorted-desc::after { content: "▼"; opacity: 1; color: var(--green-dark); }
 
-/* The top row of the current sort (the extreme for that header+direction) */
-.row-extreme td { background: #fef3c7; font-weight: 700; }
+/* The lowest $/30g row (best value) — green, regardless of current sort */
+.row-extreme td { background: var(--green-soft); font-weight: 700; }
 .row-extreme td:first-child { box-shadow: inset 3px 0 0 var(--green); }
-tbody tr.row-extreme:hover td { background: #fde9a8; }
+tbody tr.row-extreme:hover td { background: #fef3c7; } /* hovering it still shows the yellow cursor highlight */
 
 /* ---- Version ---- */
 .version { text-align: center; color: #cbd5e1; font-size: 12px; padding: 20px 0 28px; font-variant-numeric: tabular-nums; }

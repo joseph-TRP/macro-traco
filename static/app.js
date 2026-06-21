@@ -256,9 +256,9 @@ function renderDashboard() {
   }[key] || ((r) => (r[key] || "").toString().toLowerCase());
   rows.sort((a, b) => { const x = getter(a), y = getter(b); return x < y ? -dir : x > y ? dir : 0; });
 
-  // After sorting, the top row is the extreme for the current header + direction.
-  $("#data-table tbody").innerHTML = rows.map((r, i) => `
-    <tr class="${i === 0 ? "row-extreme" : ""}">
+  // Always highlight the lowest $/30g (best value) row, regardless of the sort.
+  $("#data-table tbody").innerHTML = rows.map((r) => `
+    <tr class="${r === best ? "row-extreme" : ""}">
       <td>${r["Rank"] || ""}</td>
       <td>${r["Food Item"] || ""}</td>
       <td>${r["Store"] || ""}</td>

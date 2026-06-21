@@ -33,6 +33,18 @@ STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 
 app = FastAPI(title="Macro Traco")
 
+
+@app.middleware("http")
+async def _revalidate_static(request, call_next):
+    """Make browsers revalidate the SPA assets (via ETag) instead of serving a
+    stale cached copy, so each deploy is picked up without a manual hard refresh."""
+    response = await call_next(request)
+    path = request.url.path
+    if path == "/" or path.endswith((".css", ".js", ".html")):
+        response.headers["Cache-Control"] = "no-cache"
+    return response
+
+
 # Cache the version once at startup; bump on deploy if explicitly enabled.
 _VERSION = get_version()
 

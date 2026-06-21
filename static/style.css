@@ -156,10 +156,11 @@ input.invalid { border-color: var(--danger); box-shadow: 0 0 0 3px #fee2e2; }
 .stat .v { font-size: 20px; font-weight: 800; margin-top: 2px; }
 .stat .d { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table { width: auto; border-collapse: collapse; font-size: 14px; } /* width:auto = columns fit their text */
+th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
 th { background: var(--bg); font-size: 12px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); cursor: pointer; position: sticky; top: 0; }
 th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
+th.ctr, td.ctr { text-align: center; font-variant-numeric: tabular-nums; }
 tbody tr:hover { background: #fef3c7; } /* cursor highlight = yellow */
 tbody tr:last-child td { border-bottom: 0; }
 

@@ -262,11 +262,12 @@ function renderDashboard() {
       <td>${r["Rank"] || ""}</td>
       <td>${r["Food Item"] || ""}</td>
       <td>${r["Store"] || ""}</td>
+      <td>${r["Brand"] || ""}</td>
       <td>${r["Category"] || ""}</td>
-      <td class="num">${money(dollars(r))}</td>
-      <td class="num">${r["Calories / 30g"] || ""}</td>
+      <td class="ctr">${money(dollars(r))}</td>
+      <td class="ctr">${r["Calories / 30g"] || ""}</td>
       <td>${r["Date"] || ""}</td>
-    </tr>`).join("") || `<tr><td colspan="7" style="text-align:center;color:var(--muted)">No matches</td></tr>`;
+    </tr>`).join("") || `<tr><td colspan="8" style="text-align:center;color:var(--muted)">No matches</td></tr>`;
 }
 $$("#data-table th").forEach((th) => th.addEventListener("click", () => {
   const key = th.dataset.sort;
